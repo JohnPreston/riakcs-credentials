@@ -13,7 +13,7 @@ Role Variables
 
 | Name | Default | Description
 |--- |--- |---
-| json_file | /tmp/riakcs-creds.json | File where will be stored the created credentials
+| json_file_path | /tmp | Folder in which will be stored the created credentials
 | user_name | admin | Username of the credentials
 | user_mail | admin@riak | User's mail address
 
@@ -41,7 +41,7 @@ Example Playbook
 - hosts: riakcs_nodes
   roles:
   - JohnPreston.riakcs-credentials
-  - json_file: /root/ansible.json
+  - json_file_path: /root/
   - user_name: john
   - user_mail: john@ews
 

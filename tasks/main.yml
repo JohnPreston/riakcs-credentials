@@ -3,6 +3,8 @@
 
 - name: httpblib
   yum: name=python-httplib2.noarch state=present
+  tags:
+  - riakcs_creds
 
 - name: Get credentials from RiakCS Cluster
   uri: method="POST"
@@ -12,12 +14,41 @@
        HEADER_Content-Type="application/json"
        body='{{ identity|to_nice_json }}'
        status_code=201
+       return_content=yes
   tags:
-  - riakcs_registration
+  - riakcs_creds
   when:
   - inventory_hostname == "{{ groups['riakcs_nodes'][0] }}"
+  ignore_errors: yes
+  register: MyJSON
+
+- name: DEBUG from CURL
+  debug: msg="{{ MyJSON['json']['key_id'] }} - SKEY -> {{ MyJSON['json']['key_secret'] }}"
+  when:
+  - inventory_hostname == "{{ groups['riakcs_nodes'][0] }}"
+  tags:
+  - debug
+  - riakcs_creds
+
+- name: Set RIAK variables
+  set_fact: riakcs_akey="{{ MyJSON['json']['key_id']}}"
+            riakcs_skey="{{ MyJSON['json']['key_secret'] }}"
+            riakcs_json="{{ MyJSON['json'] }}"
+  when:
+  - inventory_hostname == "{{ groups['riakcs_nodes'][0] }}"
+  tags:
+  - riakcs_creds
+
+- name: Debug RIAK variables
+  debug: msg="{{ riakcs_akey }} - {{ riakcs_skey }}"
+  tags:
+  - debug
+  when:
+  - inventory_hostname == "{{ groups['riakcs_nodes'][0] }}
 
 - name: Retrive credentials
-  fetch: src="{{ json_file }}" dest=/tmp/"riak-cs_{{ user_name }}.json"
+  fetch: src="{{ json_file }}" dest="{{ local_file }}" flat=yes
   tags:
-  - riakcs_registration
+  - riakcs_creds
+  when:
+  - inventory_hostname == "{{ groups['riakcs_nodes'][0] }}"
