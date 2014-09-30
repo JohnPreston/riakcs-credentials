@@ -2,4 +2,5 @@
 # vars file for riakcs-credentials
 
 riakcs_url: "http://{{ hostvars[groups['riakcs_nodes'][0]]['ansible_' + vnet_defined]['ipv4']['address'] }}:8080/riak-cs/user"
-creds_body: "{'email': 'user_mail', name: 'use_name'}"
+identity: { 'name': '{{ user_name }}', 'email': '{{ user_mail }}' }
+json_file: "{{json_file_path}}/riak-cs_{{ user_name }}.json"

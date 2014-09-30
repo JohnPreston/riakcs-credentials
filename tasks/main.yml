@@ -1,12 +1,23 @@
 ---
 # tasks file for riakcs-credentials
 
-- name: Retrieves credentials
+- name: httpblib
+  yum: name=python-httplib2.noarch state=present
+
+- name: Get credentials from RiakCS Cluster
   uri: method="POST"
-       url="{{ riakcs_url  }}"
-       dest="{{ json_file  }}"
+       url="{{ riakcs_url }}"
+       dest="{{ json_file }}"
        creates=yes
        HEADER_Content-Type="application/json"
-       body="{{ creds_body }}"
+       body='{{ identity|to_nice_json }}'
+       status_code=201
+  tags:
+  - riakcs_registration
+  when:
+  - inventory_hostname == "{{ groups['riakcs_nodes'][0] }}"
+
+- name: Retrive credentials
+  fetch: src="{{ json_file }}" dest=/tmp/"riak-cs_{{ user_name }}.json"
   tags:
   - riakcs_registration
