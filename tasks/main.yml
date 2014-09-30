@@ -1,0 +1,12 @@
+---
+# tasks file for riakcs-credentials
+
+- name: Retrieves credentials
+  uri: method="POST"
+       url="{{ riakcs_url  }}"
+       dest="{{ json_file  }}"
+       creates=yes
+       HEADER_Content-Type="application/json"
+       body="{{ creds_body }}"
+  tags:
+  - riakcs_registration

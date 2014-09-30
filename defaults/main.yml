@@ -1,0 +1,7 @@
+---
+# defaults file for riakcs-credentials
+
+user_name: admin
+user_mail: admin@riak
+json_file: /tmp/riakcs-creds.json
+
