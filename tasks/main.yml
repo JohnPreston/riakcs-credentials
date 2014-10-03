@@ -8,7 +8,7 @@
 
 - name: Get credentials from RiakCS Cluster
   uri: method="POST"
-       url="{{ riakcs_url }}"
+       url="{{ riakcs_register_url }}"
        dest="{{ json_file }}"
        creates=yes
        HEADER_Content-Type="application/json"
@@ -34,17 +34,13 @@
   set_fact: riakcs_akey="{{ MyJSON['json']['key_id']}}"
             riakcs_skey="{{ MyJSON['json']['key_secret'] }}"
             riakcs_json="{{ MyJSON['json'] }}"
-  when:
-  - inventory_hostname == "{{ groups['riakcs_nodes'][0] }}"
+            riakcs_endpoint="{{ riakcs_url }}"
   tags:
   - riakcs_creds
-
-- name: Debug RIAK variables
-  debug: msg="{{ riakcs_akey }} - {{ riakcs_skey }}"
-  tags:
-  - debug
   when:
-  - inventory_hostname == "{{ groups['riakcs_nodes'][0] }}
+  - inventory_hostname == "{{ groups['riakcs_nodes'][0] }}"
+  - MyJSON
+  ignore_errors: yes
 
 - name: Retrive credentials
   fetch: src="{{ json_file }}" dest="{{ local_file }}" flat=yes
